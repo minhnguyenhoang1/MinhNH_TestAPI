@@ -1,0 +1,522 @@
+{
+  "info": {
+    "_postman_id": "ca3f7874-5111-44db-b46e-6292301725dc",
+    "name": "Employee",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51753172",
+    "_collection_link": "https://go.postman.co/collection/51753172-ca3f7874-5111-44db-b46e-6292301725dc?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Create an employee",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "let body = {\r",
+              "  first_name: pm.iterationData.get(\"first_name\"),\r",
+              "  last_name: pm.iterationData.get(\"last_name\"),\r",
+              "  username: pm.iterationData.get(\"username\"),\r",
+              "  email: pm.iterationData.get(\"email\"),\r",
+              "  age: pm.iterationData.get(\"age\"),\r",
+              "  gender: pm.iterationData.get(\"gender\")\r",
+              "};\r",
+              "\r",
+              "if (pm.iterationData.has(\"salary\")) {\r",
+              "  body.salary = pm.iterationData.get(\"salary\");\r",
+              "}\r",
+              "\r",
+              "if (pm.iterationData.has(\"marital_status\")) {\r",
+              "  body.marital_status = pm.iterationData.get(\"marital_status\");\r",
+              "}\r",
+              "\r",
+              "pm.request.body.raw = JSON.stringify(body);\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const testCase = pm.iterationData.get(\"case\");\r",
+              "const expectedStatus = pm.iterationData.get(\"expectedStatus\");\r",
+              "const expectedMessage = pm.iterationData.get(\"expectedMessage\");\r",
+              "\r",
+              "let res = {};\r",
+              "try {\r",
+              "    res = pm.response.json();\r",
+              "} catch (e) {}\r",
+              "\r",
+              "pm.test(`Case: ${testCase} - Status code is ${expectedStatus}`, () => {\r",
+              "    pm.response.to.have.status(expectedStatus);\r",
+              "});\r",
+              "\r",
+              "if (expectedStatus === 201) {\r",
+              "    pm.test(\"Employee created successfully\", () => {\r",
+              "        pm.expect(res.id).to.exist;\r",
+              "    });\r",
+              "\r",
+              "    pm.environment.set(\"id\", res.id);\r",
+              "\r",
+              "    pm.test(\"Required fields are created correctly\", () => {\r",
+              "        pm.expect(res.first_name).to.eql(pm.iterationData.get(\"first_name\"));\r",
+              "        pm.expect(res.last_name).to.eql(pm.iterationData.get(\"last_name\"));\r",
+              "        pm.expect(res.username).to.eql(pm.iterationData.get(\"username\"));\r",
+              "        pm.expect(res.email).to.eql(pm.iterationData.get(\"email\"));\r",
+              "        pm.expect(res.age).to.eql(pm.iterationData.get(\"age\"));\r",
+              "        pm.expect(res.gender).to.eql(pm.iterationData.get(\"gender\"));\r",
+              "    });\r",
+              "\r",
+              "    if (pm.iterationData.has(\"salary\")) {\r",
+              "        pm.test(\"Salary is created correctly\", () => {\r",
+              "            pm.expect(res.salary).to.eql(pm.iterationData.get(\"salary\"));\r",
+              "        });\r",
+              "    }\r",
+              "\r",
+              "    if (pm.iterationData.has(\"marital_status\")) {\r",
+              "        pm.test(\"Marital status is created correctly\", () => {\r",
+              "            pm.expect(res.marital_status).to.eql(pm.iterationData.get(\"marital_status\"));\r",
+              "        });\r",
+              "    }\r",
+              "\r",
+              "} else {\r",
+              "    pm.test(\"Error message is returned\", () => {\r",
+              "        pm.expect(res.message).to.exist;\r",
+              "        pm.expect(res.message).to.include(expectedMessage);\r",
+              "    });\r",
+              "}\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/Employees",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "Employees"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all employee",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const expectedStatus = pm.iterationData.get(\"expectedStatus\") || 200;\r",
+              "\r",
+              "let res = [];\r",
+              "try {\r",
+              "    res = pm.response.json();\r",
+              "} catch (e) {}\r",
+              "\r",
+              "pm.test(\"Status code is correct\", () => {\r",
+              "    pm.response.to.have.status(expectedStatus);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response is an array\", () => {\r",
+              "    pm.expect(res).to.be.an(\"array\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Employee list is not empty\", () => {\r",
+              "    pm.expect(res.length).to.be.greaterThan(0);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Employee object has correct structure\", () => {\r",
+              "    const emp = res[0];\r",
+              "\r",
+              "    pm.expect(emp).to.have.property(\"first_name\");\r",
+              "    pm.expect(emp).to.have.property(\"last_name\");\r",
+              "    pm.expect(emp).to.have.property(\"username\");\r",
+              "    pm.expect(emp).to.have.property(\"email\");\r",
+              "    pm.expect(emp).to.have.property(\"age\");\r",
+              "    pm.expect(emp).to.have.property(\"gender\");\r",
+              "    pm.expect(emp).to.have.property(\"salary\");\r",
+              "    pm.expect(emp).to.have.property(\"marital_status\");\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/Employees",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "Employees"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get employee by id",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const expectedStatus = pm.iterationData.get(\"expectedStatus\") || 200;\r",
+              "\r",
+              "let res = {};\r",
+              "try {\r",
+              "    res = pm.response.json();\r",
+              "} catch (e) {}\r",
+              "\r",
+              "pm.test(\"Status code is correct\", () => {\r",
+              "    pm.response.to.have.status(expectedStatus);\r",
+              "});\r",
+              "\r",
+              "if (expectedStatus === 200) {\r",
+              "    pm.test(\"Employee information is returned\", () => {\r",
+              "        pm.expect(res).to.be.an(\"object\");\r",
+              "    });\r",
+              "\r",
+              "    pm.test(\"Employee has correct fields\", () => {\r",
+              "        pm.expect(res).to.have.property(\"first_name\");\r",
+              "        pm.expect(res).to.have.property(\"last_name\");\r",
+              "        pm.expect(res).to.have.property(\"username\");\r",
+              "        pm.expect(res).to.have.property(\"email\");\r",
+              "        pm.expect(res).to.have.property(\"age\");\r",
+              "        pm.expect(res).to.have.property(\"gender\");\r",
+              "        pm.expect(res).to.have.property(\"salary\");\r",
+              "        pm.expect(res).to.have.property(\"marital_status\");\r",
+              "    });\r",
+              "\r",
+              "} else if (expectedStatus === 404) {\r",
+              "    pm.test(\"Employee is not found\", () => {\r",
+              "        pm.expect(true).to.be.true;\r",
+              "    });\r",
+              "}\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseURL}} /Employees/645",
+          "host": [
+            "{{baseURL}} "
+          ],
+          "path": [
+            "Employees",
+            "645"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update an employee",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const testCase = pm.iterationData.get(\"case\");\r",
+              "const expectedStatus = pm.iterationData.get(\"expectedStatus\");\r",
+              "const expectedMessage = pm.iterationData.get(\"expectedMessage\");\r",
+              "\r",
+              "let res = {};\r",
+              "try {\r",
+              "    res = pm.response.json();\r",
+              "} catch (e) {}\r",
+              "\r",
+              "pm.test(`Case: ${testCase} - Status code is ${expectedStatus}`, () => {\r",
+              "    pm.response.to.have.status(expectedStatus);\r",
+              "});\r",
+              "\r",
+              "if (expectedStatus === 200) {\r",
+              "    pm.test(\"Employee updated successfully\", () => {\r",
+              "        pm.expect(res.id).to.exist;\r",
+              "    });\r",
+              "\r",
+              "    pm.test(\"Required fields are updated correctly\", () => {\r",
+              "        pm.expect(res.first_name).to.eql(pm.iterationData.get(\"first_name\"));\r",
+              "        pm.expect(res.last_name).to.eql(pm.iterationData.get(\"last_name\"));\r",
+              "        pm.expect(res.username).to.eql(pm.iterationData.get(\"username\"));\r",
+              "        pm.expect(res.email).to.eql(pm.iterationData.get(\"email\"));\r",
+              "        pm.expect(res.age).to.eql(pm.iterationData.get(\"age\"));\r",
+              "        pm.expect(res.gender).to.eql(pm.iterationData.get(\"gender\"));\r",
+              "    });\r",
+              "\r",
+              "    if (pm.iterationData.has(\"salary\")) {\r",
+              "        pm.test(\"Salary is updated correctly\", () => {\r",
+              "            pm.expect(res.salary).to.eql(pm.iterationData.get(\"salary\"));\r",
+              "        });\r",
+              "    }\r",
+              "\r",
+              "    if (pm.iterationData.has(\"marital_status\")) {\r",
+              "        pm.test(\"Marital status is updated correctly\", () => {\r",
+              "            pm.expect(res.marital_status).to.eql(pm.iterationData.get(\"marital_status\"));\r",
+              "        });\r",
+              "    }\r",
+              "\r",
+              "} else {\r",
+              "    pm.test(\"Error message is returned\", () => {\r",
+              "        pm.expect(res.message).to.exist;\r",
+              "        pm.expect(res.message).to.include(expectedMessage);\r",
+              "    });\r",
+              "}\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/Employees/678",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "Employees",
+            "678"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete an employee",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const status = pm.response.code;\r",
+              "\r",
+              "let res;\r",
+              "try {\r",
+              "    res = pm.response.json();\r",
+              "} catch (e) {\r",
+              "    res = pm.response.text();\r",
+              "}\r",
+              "\r",
+              "if (status === 200) {\r",
+              "    pm.test(\"Delete employee success\", () => {\r",
+              "        pm.expect(res).to.be.an(\"object\");\r",
+              "    });\r",
+              "\r",
+              "    pm.test(\"Deleted employee has correct fields\", () => {\r",
+              "        pm.expect(res).to.have.property(\"first_name\");\r",
+              "        pm.expect(res).to.have.property(\"last_name\");\r",
+              "        pm.expect(res).to.have.property(\"username\");\r",
+              "        pm.expect(res).to.have.property(\"email\");\r",
+              "        pm.expect(res).to.have.property(\"age\");\r",
+              "        pm.expect(res).to.have.property(\"gender\");\r",
+              "    });\r",
+              "\r",
+              "}\r",
+              "\r",
+              "else if (status === 404) {\r",
+              "    pm.test(\"Employee not found\", () => {\r",
+              "        pm.expect(true).to.be.true;\r",
+              "    });\r",
+              "\r",
+              "}\r",
+              "\r",
+              "else {\r",
+              "    pm.test(\"Unexpected status code\", () => {\r",
+              "        pm.expect.fail(`Unexpected status code: ${status}`);\r",
+              "    });\r",
+              "}\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/Employees/648",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "Employees",
+            "648"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": ""
+    }
+  ]
+}
